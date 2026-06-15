@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - dev  # Thay đổi theo tên nhánh của bạn trong ảnh 23141.png
+      - dev
 
 jobs:
   build:
@@ -14,42 +14,30 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Get variables
-      run: |
-        sed -i 's|\r$||g' variables build.config
-        . <(cat variables build.config)
-        for v in "${!PADAVAN_@}" "${!CONFIG_@}"; do
-          echo "$v=${!v}" >> $GITHUB_ENV
-        done
-
-    - name: Prepare toolchain and sources
+    - name: Build Toolchain
       run: |
         git config --global --add safe.directory '*'
-        # Kiểm tra nếu thư mục toolchain bị thiếu hoặc lỗi thì build từ đầu
+        # Kiểm tra nếu thư mục out chưa có thì build toolchain từ thư mục gốc 'toolchain'
         if [ ! -d "toolchain/out" ]; then
-          echo "Toolchain not found or outdated, building from source..."
+          echo "Building toolchain from source..."
           cd toolchain
           ./clean_toolchain
           ./build_toolchain
+        else
+          echo "Toolchain already built, skipping..."
         fi
 
-    - name: Install themes
+    - name: Build Firmware
       run: |
-        if [[ -n $PADAVAN_THEMES ]]; then
-          git clone --depth 1 -b "$PADAVAN_THEMES_BRANCH" "$PADAVAN_THEMES_REPO" themes
-          cp -r themes/common-theme themes/jquery.js trunk/user/www/n56u_ribbon_fixed
-          for theme in $PADAVAN_THEMES; do
-            cp -r "themes/$theme-theme" trunk/user/www/n56u_ribbon_fixed
-          done
-        fi
-
-    - name: Build firmware
-      run: |
+        # Copy file config vào trunk
         cp build.config trunk/.config
         cd trunk
+        
+        # Build firmware
         ./clear_tree.sh
         ./build_firmware.sh
         
+        # Tìm file kết quả
         FW_FILE_NAME="$(find images -type f -regextype posix-extended -iregex ".*\.(trx|bin)$" \
                         -printf "%T@\t%f\n" | sort -V | tail -1 | cut -f2)"
         echo "FW_FILE_NAME=$FW_FILE_NAME" >> $GITHUB_ENV
