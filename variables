@@ -1,8 +1,7 @@
 PADAVAN_REPO="https://gitlab.com/justanemo/padavan-ng.git"
 PADAVAN_BRANCH="master"
 PADAVAN_COMMIT="HEAD"
-PADAVAN_TOOLCHAIN_URL="https://github.com/hanwckf/rt-n56u/releases/download/v1.0/toolchain-mipsel.tar.xz"
-
+PADAVAN_TOOLCHAIN_URL="https://github.com/hanwckf/padavan-toolchain/releases/download/v1.1/mipsel-linux-uclibc.tar.xz"
 PADAVAN_THEMES_REPO="https://gitlab.com/hadzhioglu/padavan-themes.git"
 #PADAVAN_THEMES_REPO="https://gitlab.com/hadzhioglu/padavan-themes-lite.git"
 PADAVAN_THEMES_BRANCH="main"
